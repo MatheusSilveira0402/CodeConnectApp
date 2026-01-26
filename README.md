@@ -1,24 +1,24 @@
-# CodeConnect 🚀
+# CodeConnect 
 
 Aplicativo Flutter desenvolvido durante o curso da Alura, seguindo as especificações de design fornecidas no Figma. O projeto tem como objetivo aplicar conceitos fundamentais do Flutter na construção de uma interface moderna e responsiva.
 
-## 📱 Sobre o Projeto
+## Sobre o Projeto
 
 CodeConnect é uma aplicação que demonstra boas práticas de desenvolvimento Flutter, incluindo:
 
-- 🎨 Implementação fiel do design Figma
-- 🏗️ Arquitetura organizada com separação de responsabilidades
-- 🎯 Navegação entre telas usando rotas nomeadas
-- 💅 Tematização customizada com Material Design
-- 📦 Componentização de widgets reutilizáveis
+- Implementação fiel do design Figma
+- Arquitetura organizada com separação de responsabilidades
+- Navegação entre telas usando rotas nomeadas
+- Tematização customizada com Material Design
+- Componentização de widgets reutilizáveis
 
-## 🛠️ Tecnologias Utilizadas
+## Tecnologias Utilizadas
 
 - **Flutter** - Framework de desenvolvimento multiplataforma
 - **Dart** - Linguagem de programação
 - **Material Design** - Sistema de design
 
-## 📂 Estrutura do Projeto
+## Estrutura do Projeto
 
 ```
 lib/
@@ -34,7 +34,7 @@ lib/
     └── section_widgets.dart
 ```
 
-## 🚀 Como Executar
+## Como Executar
 
 ### Pré-requisitos
 
@@ -64,7 +64,7 @@ flutter pub get
 flutter run
 ```
 
-## 📚 Aprendizados
+## Aprendizados
 
 Este projeto foi desenvolvido como parte do curso de Flutter da Alura, abordando:
 
@@ -73,10 +73,10 @@ Este projeto foi desenvolvido como parte do curso de Flutter da Alura, abordando
 - Aplicação de temas consistentes
 - Boas práticas de estruturação de projetos Flutter
 
-## 📄 Licença
+## Licença
 
 Este projeto foi desenvolvido para fins educacionais durante o curso da Alura.
 
 ---
 
-Desenvolvido com ❤️ durante o curso de Flutter da [Alura](https://www.alura.com.br/)
+Desenvolvido com durante o curso de Flutter da [Alura](https://www.alura.com.br/)
