@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
+import '../core/constants.dart';
 
+/// Tema customizado do aplicativo CodeConnect
 class AppTheme {
+  AppTheme._();
   // Cores
   static const primaryColor = Color(0xFF00FF88);
   static const backgroundColor = Color(0xFF0A0F1E);
@@ -75,10 +78,18 @@ class AppTheme {
     ),
     outlinedButtonTheme: OutlinedButtonThemeData(
       style: OutlinedButton.styleFrom(
-        side: const BorderSide(color: primaryColor, width: 2),
+        side: BorderSide(
+          color: primaryColor,
+          width: UiConstants.borderWidthDefault,
+        ),
         foregroundColor: primaryColor,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(UiConstants.borderRadiusSmall),
+        ),
+        padding: EdgeInsets.symmetric(
+          horizontal: UiConstants.paddingLarge,
+          vertical: UiConstants.paddingSmall,
+        ),
         textStyle: const TextStyle(fontWeight: FontWeight.bold),
       ),
     ),

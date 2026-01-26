@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+/// Widget que exibe o logo do CodeConnect
 class CodeConnectLogo extends StatelessWidget {
   final double height;
 

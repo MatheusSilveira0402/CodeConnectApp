@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import '../core/constants.dart';
 import '../theme/app_theme.dart';
 
+/// Widget para título de seção
 class SectionTitle extends StatelessWidget {
   final String title;
 
@@ -9,12 +11,16 @@ class SectionTitle extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.only(top: 32, bottom: 16),
+      padding: EdgeInsets.only(
+        top: UiConstants.spacingXLarge,
+        bottom: UiConstants.paddingMedium,
+      ),
       child: Text(title, style: AppTheme.titleMedium),
     );
   }
 }
 
+/// Widget para conteúdo de seção
 class SectionContent extends StatelessWidget {
   final String content;
 
@@ -26,6 +32,7 @@ class SectionContent extends StatelessWidget {
   }
 }
 
+/// Widget para exibir imagens com destaque
 class FeatureImage extends StatelessWidget {
   final IconData? icon;
   final String? imagePath;
@@ -44,9 +51,9 @@ class FeatureImage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       height: height,
-      margin: const EdgeInsets.symmetric(vertical: 32),
+      margin: EdgeInsets.symmetric(vertical: UiConstants.spacingXLarge),
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(UiConstants.borderRadiusMedium),
         gradient: LinearGradient(
           begin: Alignment.topCenter,
           end: Alignment.bottomCenter,
@@ -61,7 +68,9 @@ class FeatureImage extends StatelessWidget {
       child: Center(
         child: imagePath != null
             ? ClipRRect(
-                borderRadius: BorderRadius.circular(16),
+                borderRadius: BorderRadius.circular(
+                  UiConstants.borderRadiusMedium,
+                ),
                 child: Image.asset(
                   imagePath!,
                   height: height * 0.8,

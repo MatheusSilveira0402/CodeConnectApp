@@ -1,21 +1,26 @@
 import 'package:flutter/material.dart';
+import '../core/constants.dart';
 import '../theme/app_theme.dart';
 import '../widgets/code_connect_app_bar.dart';
-import '../widgets/code_connect_logo.dart';
+import '../widgets/code_connect_nav_bar.dart';
 import '../widgets/section_widgets.dart';
+import '../viewmodels/navigation_viewmodel.dart';
 
+/// Tela com informações sobre o CodeConnect
 class SobreNosScreen extends StatelessWidget {
   const SobreNosScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final viewModel = NavigationViewModel();
+
     return Scaffold(
       appBar: const CodeConnectAppBar(),
       body: SingleChildScrollView(
         child: Padding(
-          padding: const EdgeInsets.all(24.0),
+          padding: EdgeInsets.all(UiConstants.paddingLarge),
           child: Column(
-            spacing: 16,
+            spacing: UiConstants.spacingLarge,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Image.asset(
@@ -29,11 +34,11 @@ class SobreNosScreen extends StatelessWidget {
                   Column(
                     children: [
                       Text(
-                        'Bem-Vindo ao\nCodeConnect!',
+                        AppStrings.sobreNosWelcome,
                         style: AppTheme.titleLarge,
                       ),
                       Text(
-                        'Onde a comunidade\ne o código se unem!',
+                        AppStrings.sobreNosSubtitle,
                         style: AppTheme.titleLargeWhite,
                       ),
                     ],
@@ -47,37 +52,33 @@ class SobreNosScreen extends StatelessWidget {
               const SectionContent(
                 'Na CodeConnect, acreditamos que a colaboração é a essência da inovação. Nossa missão é fornecer uma plataforma onde as mentes criativas podem se unir, compartilhar conhecimento, e desenvolver projetos extraordinários. Quer você seja um novato ansioso para aprender ou um veterano experiente, você encontrará aqui um lar para suas aspirações tecnológicas.',
               ),
-              const FeatureImage(
-                imagePath: 'lib/assets/notebook.png',
-                height: 240,
+              Image.asset(
+                'lib/assets/notebook.png',
+                fit: BoxFit.cover,
+                width: double.infinity,
               ),
               const SectionTitle('Junte-se a Nós!'),
               const SectionContent(
                 'Estamos animados para ter você conosco nesta jornada empolgante. Junte-se à nossa comunidade vibrante e descubra o poder da colaboração no mundo do código',
               ),
-              const Center(child: CodeConnectLogo(height: 48)),
-              const Center(
-                child: Text(
-                  'Juntos, vamos transformar\nideias em inovações e moldar\no futuro digital.',
-                  textAlign: TextAlign.center,
-                  style: AppTheme.bodyMedium,
+              Center(
+                child: Image.asset(
+                  'lib/assets/icon_logo_verde.png',
+                  width: UiConstants.logoIconSize,
+                  height: UiConstants.logoIconSize,
                 ),
+              ),
+              Text(
+                'Juntos, vamos transformar ideias em inovações e moldar o futuro digital.',
+                style: AppTheme.bodyMedium,
               ),
             ],
           ),
         ),
       ),
-      bottomNavigationBar: BottomNavigationBar(
+      bottomNavigationBar: CodeConnectNavBar(
+        viewModel: viewModel,
         currentIndex: 2,
-        items: const [
-          BottomNavigationBarItem(icon: Icon(Icons.feed), label: 'Feed'),
-          BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Perfil'),
-          BottomNavigationBarItem(icon: Icon(Icons.info), label: 'Sobre nós'),
-          BottomNavigationBarItem(icon: Icon(Icons.logout), label: 'Sair'),
-        ],
-        onTap: (index) {
-          if (index == 0) Navigator.pushReplacementNamed(context, '/');
-        },
       ),
     );
   }

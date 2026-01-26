@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import '../core/constants.dart';
 import 'code_connect_logo.dart';
 
+/// AppBar customizada do CodeConnect com logo e botão de publicar
 class CodeConnectAppBar extends StatelessWidget implements PreferredSizeWidget {
   final VoidCallback? onPublicarPressed;
 
@@ -9,18 +11,21 @@ class CodeConnectAppBar extends StatelessWidget implements PreferredSizeWidget {
   @override
   Widget build(BuildContext context) {
     return AppBar(
-      toolbarHeight: 130,
+      toolbarHeight: UiConstants.appBarHeight,
       flexibleSpace: SafeArea(
         child: Padding(
-          padding: const EdgeInsets.symmetric(vertical: 12.0, horizontal: 16.0),
+          padding: EdgeInsets.symmetric(
+            vertical: UiConstants.paddingSmall,
+            horizontal: UiConstants.paddingMedium,
+          ),
           child: Column(
+            spacing: UiConstants.spacingMedium,
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              const CodeConnectLogo(height: 36),
-              const SizedBox(height: 12),
+              const CodeConnectLogo(height: UiConstants.iconSizeSmall),
               OutlinedButton(
                 onPressed: onPublicarPressed ?? () {},
-                child: const Text('Publicar'),
+                child: const Text(AppStrings.btnPublicar),
               ),
             ],
           ),
@@ -30,5 +35,5 @@ class CodeConnectAppBar extends StatelessWidget implements PreferredSizeWidget {
   }
 
   @override
-  Size get preferredSize => const Size.fromHeight(130);
+  Size get preferredSize => const Size.fromHeight(UiConstants.appBarHeight);
 }
