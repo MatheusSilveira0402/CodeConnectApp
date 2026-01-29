@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
 import '../core/constants.dart';
-import 'code_connect_logo.dart';
+import '../screens/criar_post_screen.dart';
+import 'app_logo.dart';
 
 /// AppBar customizada do CodeConnect com logo e botão de publicar
-class CodeConnectAppBar extends StatelessWidget implements PreferredSizeWidget {
+class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
   final VoidCallback? onPublicarPressed;
 
-  const CodeConnectAppBar({super.key, this.onPublicarPressed});
+  const CustomAppBar({super.key, this.onPublicarPressed});
 
   @override
   Widget build(BuildContext context) {
@@ -14,7 +15,7 @@ class CodeConnectAppBar extends StatelessWidget implements PreferredSizeWidget {
       toolbarHeight: UiConstants.appBarHeight,
       flexibleSpace: SafeArea(
         child: Padding(
-          padding: EdgeInsets.symmetric(
+          padding: const EdgeInsets.symmetric(
             vertical: UiConstants.paddingSmall,
             horizontal: UiConstants.paddingMedium,
           ),
@@ -22,9 +23,20 @@ class CodeConnectAppBar extends StatelessWidget implements PreferredSizeWidget {
             spacing: UiConstants.spacingMedium,
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              const CodeConnectLogo(height: UiConstants.iconSizeSmall),
+              const AppLogo(height: UiConstants.iconSizeSmall),
               OutlinedButton(
-                onPressed: onPublicarPressed ?? () {},
+                onPressed: () async {
+                  if (onPublicarPressed != null) {
+                    onPublicarPressed!();
+                  } else {
+                    await Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const CriarPostScreen(),
+                      ),
+                    );
+                  }
+                },
                 child: const Text(AppStrings.btnPublicar),
               ),
             ],

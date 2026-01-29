@@ -1,10 +1,12 @@
 import 'package:mobx/mobx.dart';
+import '../core/utils/app_logger.dart';
 import '../models/user_model.dart';
 import '../repositories/user_repository.dart';
 
 part 'perfil_store.g.dart';
 
 /// Store para gerenciar o estado do perfil do usuário
+// ignore: library_private_types_in_public_api
 class PerfilStore = _PerfilStore with _$PerfilStore;
 
 abstract class _PerfilStore with Store {
@@ -30,9 +32,12 @@ abstract class _PerfilStore with Store {
     errorMessage = null;
     try {
       user = await repository.getMe();
-    } catch (e) {
-      errorMessage = e.toString();
-      user = _getMockUser(); // Mock para desenvolvimento
+      AppLogger.info('Perfil carregado: ${user?.name}', 'PerfilStore');
+    } catch (e, stackTrace) {
+      const message = 'Erro ao carregar perfil';
+      errorMessage = message;
+      user = null;
+      AppLogger.error(message, e, stackTrace, 'PerfilStore');
     } finally {
       isLoading = false;
     }
@@ -44,8 +49,11 @@ abstract class _PerfilStore with Store {
     errorMessage = null;
     try {
       user = await repository.updateAvatar(path);
-    } catch (e) {
-      errorMessage = e.toString();
+      AppLogger.info('Avatar atualizado', 'PerfilStore');
+    } catch (e, stackTrace) {
+      const message = 'Erro ao atualizar avatar';
+      errorMessage = message;
+      AppLogger.error(message, e, stackTrace, 'PerfilStore');
     } finally {
       isLoading = false;
     }
@@ -54,17 +62,5 @@ abstract class _PerfilStore with Store {
   @action
   void clearError() {
     errorMessage = null;
-  }
-
-  // Mock para desenvolvimento enquanto API não está pronta
-  UserModel _getMockUser() {
-    return UserModel(
-      id: '1',
-      name: 'Júlio Oliveira',
-      email: 'julio@codeconnect.com',
-      avatar: 'lib/assets/icon_logo.png',
-      createdAt: DateTime.now(),
-      updatedAt: DateTime.now(),
-    );
   }
 }

@@ -6,17 +6,33 @@ part of 'blog_post_model.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
+PostAuthor _$PostAuthorFromJson(Map<String, dynamic> json) => PostAuthor(
+  id: json['id'] as String,
+  name: json['name'] as String,
+  username: json['username'] as String?,
+  avatar: json['avatar'] as String?,
+);
+
+Map<String, dynamic> _$PostAuthorToJson(PostAuthor instance) =>
+    <String, dynamic>{
+      'id': instance.id,
+      'name': instance.name,
+      'username': instance.username,
+      'avatar': instance.avatar,
+    };
+
 BlogPostModel _$BlogPostModelFromJson(Map<String, dynamic> json) =>
     BlogPostModel(
-      id: json['id'] as String,
+      id: (json['id'] as num).toInt(),
+      cover: json['cover'] as String?,
+      imageUrl: json['imageUrl'] as String?,
       title: json['title'] as String,
-      content: json['content'] as String,
       slug: json['slug'] as String,
-      authorId: json['authorId'] as String,
-      authorName: json['authorName'] as String?,
-      coverImage: json['coverImage'] as String?,
+      body: json['body'] as String,
+      markdown: json['markdown'] as String,
       likes: (json['likes'] as num?)?.toInt() ?? 0,
-      commentsCount: (json['commentsCount'] as num?)?.toInt() ?? 0,
+      author: PostAuthor.fromJson(json['author'] as Map<String, dynamic>),
+      comments: json['comments'] as List<dynamic>?,
       createdAt: DateTime.parse(json['createdAt'] as String),
       updatedAt: DateTime.parse(json['updatedAt'] as String),
     );
@@ -24,14 +40,15 @@ BlogPostModel _$BlogPostModelFromJson(Map<String, dynamic> json) =>
 Map<String, dynamic> _$BlogPostModelToJson(BlogPostModel instance) =>
     <String, dynamic>{
       'id': instance.id,
+      'cover': instance.cover,
+      'imageUrl': instance.imageUrl,
       'title': instance.title,
-      'content': instance.content,
       'slug': instance.slug,
-      'authorId': instance.authorId,
-      'authorName': instance.authorName,
-      'coverImage': instance.coverImage,
+      'body': instance.body,
+      'markdown': instance.markdown,
       'likes': instance.likes,
-      'commentsCount': instance.commentsCount,
+      'author': instance.author,
+      'comments': instance.comments,
       'createdAt': instance.createdAt.toIso8601String(),
       'updatedAt': instance.updatedAt.toIso8601String(),
     };

@@ -1,9 +1,13 @@
 import 'package:flutter/material.dart';
 import '../core/constants.dart';
+import '../stores/auth_store.dart';
 
 /// ViewModel responsável por gerenciar a navegação do aplicativo
 class NavigationViewModel extends ChangeNotifier {
+  final AuthStore _authStore;
   int _currentIndex = 0;
+
+  NavigationViewModel(this._authStore);
 
   int get currentIndex => _currentIndex;
 
@@ -30,26 +34,45 @@ class NavigationViewModel extends ChangeNotifier {
   }
 
   /// Exibe diálogo de confirmação de logout
-  void _handleLogout(BuildContext context) {
-    showDialog(
+  Future<void> _handleLogout(BuildContext context) async {
+    final confirm = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
         title: const Text(AppStrings.logoutTitle),
         content: const Text(AppStrings.logoutMessage),
         actions: [
           TextButton(
-            onPressed: () => Navigator.pop(context),
+            onPressed: () => Navigator.pop(context, false),
             child: const Text(AppStrings.btnCancelar),
           ),
           TextButton(
-            onPressed: () {
-              Navigator.pop(context);
-              Navigator.pushReplacementNamed(context, AppRoutes.home);
-            },
+            onPressed: () => Navigator.pop(context, true),
+            style: TextButton.styleFrom(foregroundColor: Colors.red),
             child: const Text(AppStrings.navSair),
           ),
         ],
       ),
     );
+
+    if (confirm == true && context.mounted) {
+      try {
+        await _authStore.logout();
+
+        if (context.mounted) {
+          Navigator.of(
+            context,
+          ).pushNamedAndRemoveUntil(AppRoutes.login, (route) => false);
+        }
+      } catch (e) {
+        if (context.mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('Erro ao fazer logout: $e'),
+              backgroundColor: Colors.red,
+            ),
+          );
+        }
+      }
+    }
   }
 }

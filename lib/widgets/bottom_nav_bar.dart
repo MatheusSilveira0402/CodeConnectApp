@@ -3,11 +3,11 @@ import '../core/constants.dart';
 import '../viewmodels/navigation_viewmodel.dart';
 
 /// Barra de navegação inferior do CodeConnect
-class CodeConnectNavBar extends StatelessWidget {
+class BottomNavBar extends StatelessWidget {
   final NavigationViewModel viewModel;
   final int currentIndex;
 
-  const CodeConnectNavBar({
+  const BottomNavBar({
     super.key,
     required this.viewModel,
     required this.currentIndex,

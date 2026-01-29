@@ -33,6 +33,30 @@ migrate_working_dir/
 /build/
 /coverage/
 
+# Generated files (MobX, json_serializable, etc)
+*.g.dart
+*.gr.dart
+*.freezed.dart
+*.config.dart
+
+# Environment variables and secrets
+.env
+.env.*
+!.env.example
+*.key
+*.pem
+*.p12
+*.keystore
+*.jks
+google-services.json
+GoogleService-Info.plist
+
+# Documentation files (optional - pode descomentar se não quiser commitar)
+# CODE_REVIEW*.md
+# NAMING_*.md
+# REFACTORING_*.md
+# ESTRUTURA_*.md
+
 # Symbolication related
 app.*.symbols
 

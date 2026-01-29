@@ -11,6 +11,11 @@ class AppTheme {
   static const textPrimary = Colors.white;
   static const textSecondary = Colors.white70;
 
+  // Alias para compatibilidade
+  static const textColor = textPrimary;
+  static const cardColor = surfaceColor;
+  static const borderColor = Color(0xFF2A2F3A);
+
   // Text Styles
   static const titleLarge = TextStyle(
     color: primaryColor,

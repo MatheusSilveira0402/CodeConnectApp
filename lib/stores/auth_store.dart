@@ -1,5 +1,6 @@
 import 'package:mobx/mobx.dart';
 import '../core/exceptions/api_exception.dart';
+import '../core/utils/app_logger.dart';
 import '../models/user_model.dart';
 import '../repositories/user_repository.dart';
 
@@ -36,14 +37,17 @@ abstract class _AuthStore with Store {
 
     try {
       currentUser = await _userRepository.login(email, password);
-      print(currentUser);
       isAuthenticated = true;
+      AppLogger.info('Login realizado: ${currentUser?.email}', 'AuthStore');
       return true;
-    } on ApiException catch (e) {
+    } on ApiException catch (e, stackTrace) {
       errorMessage = e.message;
+      AppLogger.error('Falha no login', e, stackTrace, 'AuthStore');
       return false;
-    } catch (e) {
-      errorMessage = 'Erro ao fazer login. Tente novamente.';
+    } catch (e, stackTrace) {
+      const message = 'Erro ao fazer login. Tente novamente.';
+      errorMessage = message;
+      AppLogger.error(message, e, stackTrace, 'AuthStore');
       return false;
     } finally {
       isLoading = false;
@@ -58,12 +62,16 @@ abstract class _AuthStore with Store {
     try {
       currentUser = await _userRepository.register(name, email, password);
       isAuthenticated = true;
+      AppLogger.info('Registro realizado: ${currentUser?.email}', 'AuthStore');
       return true;
-    } on ApiException catch (e) {
+    } on ApiException catch (e, stackTrace) {
       errorMessage = e.message;
+      AppLogger.error('Falha no registro', e, stackTrace, 'AuthStore');
       return false;
-    } catch (e) {
-      errorMessage = 'Erro ao criar conta. Tente novamente.';
+    } catch (e, stackTrace) {
+      const message = 'Erro ao criar conta. Tente novamente.';
+      errorMessage = message;
+      AppLogger.error(message, e, stackTrace, 'AuthStore');
       return false;
     } finally {
       isLoading = false;
@@ -79,10 +87,14 @@ abstract class _AuthStore with Store {
       await _userRepository.logout();
       currentUser = null;
       isAuthenticated = false;
-    } on ApiException catch (e) {
+      AppLogger.info('Logout realizado', 'AuthStore');
+    } on ApiException catch (e, stackTrace) {
       errorMessage = e.message;
-    } catch (e) {
-      errorMessage = 'Erro ao fazer logout.';
+      AppLogger.error('Falha no logout', e, stackTrace, 'AuthStore');
+    } catch (e, stackTrace) {
+      const message = 'Erro ao fazer logout.';
+      errorMessage = message;
+      AppLogger.error(message, e, stackTrace, 'AuthStore');
     } finally {
       isLoading = false;
     }

@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import '../core/constants.dart';
-import '../repositories/user_repository.dart';
+import '../core/di/service_locator.dart';
+import '../core/validators/field_validators.dart';
 import '../stores/auth_store.dart';
 import '../theme/app_theme.dart';
 import '../widgets/auth/custom_text_field.dart';
@@ -17,17 +18,13 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen> {
-  late final AuthStore _authStore;
+  // Usando Service Locator para obter a instância singleton do AuthStore
+  late final AuthStore _authStore = ServiceLocator.instance.authStore;
+
   final _formKey = GlobalKey<FormState>();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   bool _rememberMe = false;
-
-  @override
-  void initState() {
-    super.initState();
-    _authStore = AuthStore(UserRepository());
-  }
 
   @override
   void dispose() {
@@ -114,12 +111,12 @@ class _LoginScreenState extends State<LoginScreen> {
                               controller: _emailController,
                               keyboardType: TextInputType.emailAddress,
                               prefixIcon: Icons.email,
-                              validator: _validateEmail,
+                              validator: FieldValidators.email,
                             ),
                             PasswordField(
                               label: 'Senha',
                               controller: _passwordController,
-                              validator: _validatePassword,
+                              validator: FieldValidators.password,
                             ),
                             Row(
                               children: [
@@ -265,26 +262,6 @@ class _LoginScreenState extends State<LoginScreen> {
     );
   }
 
-  String? _validateEmail(String? value) {
-    if (value == null || value.isEmpty) {
-      return 'Email é obrigatório';
-    }
-    if (!value.contains('@')) {
-      return 'Email inválido';
-    }
-    return null;
-  }
-
-  String? _validatePassword(String? value) {
-    if (value == null || value.isEmpty) {
-      return 'Senha é obrigatória';
-    }
-    if (value.length < 6) {
-      return 'Senha deve ter no mínimo 6 caracteres';
-    }
-    return null;
-  }
-
   Future<void> _handleLogin() async {
     if (!_formKey.currentState!.validate()) return;
 
@@ -293,20 +270,21 @@ class _LoginScreenState extends State<LoginScreen> {
       _passwordController.text,
     );
 
-    print(success);
-
     if (success && mounted) {
       Navigator.pushReplacementNamed(context, AppRoutes.home);
     }
   }
 
   void _handleForgotPassword() {
+    if (!mounted) return;
+
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(content: Text('Recuperação de senha em breve...')),
     );
   }
 }
 
+/// Widget de botão social reutilizável
 class _SocialButton extends StatelessWidget {
   final IconData icon;
   final String label;

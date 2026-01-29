@@ -2,31 +2,54 @@ import 'package:json_annotation/json_annotation.dart';
 
 part 'blog_post_model.g.dart';
 
+/// Modelo de autor do post
+@JsonSerializable()
+class PostAuthor {
+  final String id;
+  final String name;
+  final String? username;
+  final String? avatar;
+
+  PostAuthor({
+    required this.id,
+    required this.name,
+    this.username,
+    this.avatar,
+  });
+
+  factory PostAuthor.fromJson(Map<String, dynamic> json) =>
+      _$PostAuthorFromJson(json);
+
+  Map<String, dynamic> toJson() => _$PostAuthorToJson(this);
+}
+
 /// Modelo de post do blog
 @JsonSerializable()
 class BlogPostModel {
-  final String id;
+  final int id;
+  final String? cover;
+  final String? imageUrl;
   final String title;
-  final String content;
   final String slug;
-  final String authorId;
-  final String? authorName;
-  final String? coverImage;
+  final String body;
+  final String markdown;
   final int likes;
-  final int commentsCount;
+  final PostAuthor author;
+  final List<dynamic>? comments;
   final DateTime createdAt;
   final DateTime updatedAt;
 
   BlogPostModel({
     required this.id,
+    this.cover,
+    this.imageUrl,
     required this.title,
-    required this.content,
     required this.slug,
-    required this.authorId,
-    this.authorName,
-    this.coverImage,
+    required this.body,
+    required this.markdown,
     this.likes = 0,
-    this.commentsCount = 0,
+    required this.author,
+    this.comments,
     required this.createdAt,
     required this.updatedAt,
   });
@@ -35,6 +58,11 @@ class BlogPostModel {
       _$BlogPostModelFromJson(json);
 
   Map<String, dynamic> toJson() => _$BlogPostModelToJson(this);
+
+  // Getters para compatibilidade
+  String get authorName => author.name;
+  String get authorId => author.id;
+  String get image => imageUrl ?? '';
 }
 
 /// Modelo de comentário

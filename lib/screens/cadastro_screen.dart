@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import '../core/constants.dart';
-import '../repositories/user_repository.dart';
+import '../core/di/service_locator.dart';
+import '../core/validators/field_validators.dart';
 import '../stores/auth_store.dart';
 import '../theme/app_theme.dart';
 import '../widgets/auth/custom_text_field.dart';
@@ -17,18 +18,14 @@ class CadastroScreen extends StatefulWidget {
 }
 
 class _CadastroScreenState extends State<CadastroScreen> {
-  late final AuthStore _authStore;
+  // Usando Service Locator para obter a instância singleton do AuthStore
+  late final AuthStore _authStore = ServiceLocator.instance.authStore;
+
   final _formKey = GlobalKey<FormState>();
   final _nameController = TextEditingController();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   final _confirmPasswordController = TextEditingController();
-
-  @override
-  void initState() {
-    super.initState();
-    _authStore = AuthStore(UserRepository());
-  }
 
   @override
   void dispose() {
@@ -85,7 +82,7 @@ class _CadastroScreenState extends State<CadastroScreen> {
                       controller: _nameController,
                       keyboardType: TextInputType.name,
                       prefixIcon: Icons.person,
-                      validator: _validateName,
+                      validator: FieldValidators.fullName,
                     ),
                     CustomTextField(
                       label: 'Endereço de email',
@@ -93,17 +90,20 @@ class _CadastroScreenState extends State<CadastroScreen> {
                       controller: _emailController,
                       keyboardType: TextInputType.emailAddress,
                       prefixIcon: Icons.email,
-                      validator: _validateEmail,
+                      validator: FieldValidators.email,
                     ),
                     PasswordField(
                       label: 'Senha',
                       controller: _passwordController,
-                      validator: _validatePassword,
+                      validator: FieldValidators.password,
                     ),
                     PasswordField(
                       label: 'Confirmar senha',
                       controller: _confirmPasswordController,
-                      validator: _validateConfirmPassword,
+                      validator: (value) => FieldValidators.confirmPassword(
+                        value,
+                        _passwordController.text,
+                      ),
                     ),
                     if (_authStore.hasError)
                       Container(
@@ -212,46 +212,6 @@ class _CadastroScreenState extends State<CadastroScreen> {
     );
   }
 
-  String? _validateName(String? value) {
-    if (value == null || value.isEmpty) {
-      return 'Nome é obrigatório';
-    }
-    if (value.length < 3) {
-      return 'Nome deve ter no mínimo 3 caracteres';
-    }
-    return null;
-  }
-
-  String? _validateEmail(String? value) {
-    if (value == null || value.isEmpty) {
-      return 'Email é obrigatório';
-    }
-    if (!value.contains('@') || !value.contains('.')) {
-      return 'Email inválido';
-    }
-    return null;
-  }
-
-  String? _validatePassword(String? value) {
-    if (value == null || value.isEmpty) {
-      return 'Senha é obrigatória';
-    }
-    if (value.length < 6) {
-      return 'Senha deve ter no mínimo 6 caracteres';
-    }
-    return null;
-  }
-
-  String? _validateConfirmPassword(String? value) {
-    if (value == null || value.isEmpty) {
-      return 'Confirmação de senha é obrigatória';
-    }
-    if (value != _passwordController.text) {
-      return 'As senhas não conferem';
-    }
-    return null;
-  }
-
   Future<void> _handleRegister() async {
     if (!_formKey.currentState!.validate()) return;
 
@@ -261,12 +221,15 @@ class _CadastroScreenState extends State<CadastroScreen> {
       _passwordController.text,
     );
 
-    if (success && mounted) {
+    if (!mounted) return;
+
+    if (success) {
       Navigator.pushReplacementNamed(context, AppRoutes.home);
     }
   }
 }
 
+/// Widget de botão social reutilizável
 class _SocialButton extends StatelessWidget {
   final IconData icon;
   final String label;

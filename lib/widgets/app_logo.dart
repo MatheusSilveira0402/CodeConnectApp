@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 
 /// Widget que exibe o logo do CodeConnect
-class CodeConnectLogo extends StatelessWidget {
+class AppLogo extends StatelessWidget {
   final double height;
 
-  const CodeConnectLogo({super.key, this.height = 24});
+  const AppLogo({super.key, this.height = 24});
 
   @override
   Widget build(BuildContext context) {
