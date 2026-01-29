@@ -132,7 +132,7 @@ flutter test
 
 ## Configuração de Ambiente
 
-Crie um arquivo `.env`:
+Crie um arquivo `.env` na raiz do projeto baseado no `.env.example`:
 
 ```env
 API_BASE_URL=http://seu-servidor:3000
