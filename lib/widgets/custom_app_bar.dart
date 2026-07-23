@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../core/constants.dart';
+import '../l10n/app_localizations.dart';
 import '../screens/criar_post_screen.dart';
 import 'app_logo.dart';
 
@@ -37,7 +38,7 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
                     );
                   }
                 },
-                child: const Text(AppStrings.btnPublicar),
+                child: Text(AppLocalizations.of(context).btnPublicar),
               ),
             ],
           ),

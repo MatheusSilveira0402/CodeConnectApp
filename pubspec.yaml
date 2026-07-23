@@ -36,24 +36,45 @@ dependencies:
   cupertino_icons: ^1.0.8
   
   # State Management
-  mobx: ^2.4.1
-  flutter_mobx: ^2.2.1+1
-  
+  flutter_bloc: ^9.1.1
+  equatable: ^2.0.7
+
   # HTTP Clients
   dio: ^5.7.0
   flutter_secure_storage: ^9.2.2
-  
+
+  # Persistência offline / cache local
+  hive: ^2.2.3
+  hive_flutter: ^1.1.0
+  connectivity_plus: ^6.1.3
+
+
+  # Câmera e permissões
+  camera: ^0.11.0+2
+  permission_handler: ^11.3.1
+
+  # Geolocalização e mapa
+  geolocator: ^13.0.2
+  google_maps_flutter: ^2.10.0
+
   # Image Picker
   image_picker: ^1.1.2
-  
+
+  # Internacionalização
+  flutter_localizations:
+    sdk: flutter
+  intl: ^0.20.2
+
   # Environment Variables
   flutter_dotenv: ^5.2.1
-  
+
   # Code Generation
   json_annotation: ^4.9.0
 
 dev_dependencies:
   flutter_test:
+    sdk: flutter
+  integration_test:
     sdk: flutter
 
   # The "flutter_lints" package below contains a set of recommended lints to
@@ -62,10 +83,13 @@ dev_dependencies:
   # package. See that file for information about deactivating specific lint
   # rules and activating additional ones.
   flutter_lints: ^6.0.0
-  
+
+  # Testes
+  bloc_test: ^10.0.0
+  mocktail: ^1.0.4
+
   # Code Generation
   build_runner: ^2.4.13
-  mobx_codegen: ^2.6.1
   json_serializable: ^6.8.0
 
 # For information on the generic Dart part of this file, see the
@@ -78,6 +102,9 @@ flutter:
   # included with your application, so that you can use the icons in
   # the material Icons class.
   uses-material-design: true
+
+  # Internacionalização (gen-l10n)
+  generate: true
 
   # To add assets to your application, add an assets section, like this:
   assets:

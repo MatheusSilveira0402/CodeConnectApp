@@ -1,0 +1,208 @@
+{
+  "@@locale": "pt",
+
+  "appTitle": "CodeConnect",
+
+  "navFeed": "Feed",
+  "navPerfil": "Perfil",
+  "navDevsNearYou": "Devs",
+  "navSobreNos": "Sobre nós",
+  "navSair": "Sair",
+
+  "btnPublicar": "Publicar",
+  "btnCancelar": "Cancelar",
+  "btnRetry": "Tentar novamente",
+  "btnDelete": "Excluir",
+  "btnDiscard": "Descartar",
+  "btnUpdate": "Atualizar",
+
+  "logoutTitle": "Sair",
+  "logoutMessage": "Deseja realmente sair?",
+  "logoutError": "Erro ao fazer logout: {error}",
+  "@logoutError": {
+    "placeholders": { "error": { "type": "String" } }
+  },
+
+  "sobreNosWelcome": "Bem-Vindo ao\nCodeConnect!",
+  "sobreNosSubtitle": "Onde a comunidade\ne o código se unem!",
+  "sobreNosIntro": "No coração da revolução digital está o CodeConnect nasceu da visão de criar um espaço onde desenvolvedores e apaixonados e entusiastas da tecnologia podem se conectar, aprender e colaborar de maneira inigualável! Somos uma comunidade global apaixonada, por código e comprometidos em oferecer um ambiente inclusivo e acolhedor para todos os níveis de habilidade.",
+  "sobreNosMissionTitle": "Nossa Missão",
+  "sobreNosMissionText": "Na CodeConnect, acreditamos que a colaboração é a essência da inovação. Nossa missão é fornecer uma plataforma onde as mentes criativas podem se unir, compartilhar conhecimento, e desenvolver projetos extraordinários. Quer você seja um novato ansioso para aprender ou um veterano experiente, você encontrará aqui um lar para suas aspirações tecnológicas.",
+  "sobreNosJoinTitle": "Junte-se a Nós!",
+  "sobreNosJoinText": "Estamos animados para ter você conosco nesta jornada empolgante. Junte-se à nossa comunidade vibrante e descubra o poder da colaboração no mundo do código",
+  "sobreNosFooter": "Juntos, vamos transformar ideias em inovações e moldar o futuro digital.",
+
+  "loginWelcome": "Bem-vindo! Faça seu login",
+  "fieldEmailOrUsernameLabel": "Email ou usuário",
+  "fieldEmailHint": "Digite seu email",
+  "fieldPasswordLabel": "Senha",
+  "rememberMe": "Lembrar-me",
+  "forgotPassword": "Esqueci a senha",
+  "forgotPasswordSnack": "Recuperação de senha em breve...",
+  "btnLogin": "Login",
+  "orContinueWith": "ou continue com",
+  "githubLabel": "GitHub",
+  "googleLabel": "Google",
+  "noAccountYet": "Ainda não tem conta?",
+  "signUpNow": "Cadastre-se!",
+
+  "cadastroTitle": "Cadastro",
+  "cadastroSubtitle": "Olá! Preencha seus dados",
+  "fieldNameLabel": "Nome",
+  "fieldNameHint": "Nome completo",
+  "fieldEmailAddressLabel": "Endereço de email",
+  "fieldConfirmPasswordLabel": "Confirmar senha",
+  "btnCadastrar": "Cadastrar",
+  "orCreateAccountWith": "ou crie conta com",
+  "alreadyHaveAccount": "Já tem conta?",
+  "loginNow": "Faça seu login!",
+
+  "defaultFieldName": "Campo",
+  "validatorEmailRequired": "Email é obrigatório",
+  "validatorEmailInvalid": "Email inválido",
+  "validatorPasswordRequired": "Senha é obrigatória",
+  "validatorPasswordMinLength": "Senha deve ter pelo menos {minLength} caracteres",
+  "@validatorPasswordMinLength": {
+    "placeholders": { "minLength": { "type": "int" } }
+  },
+  "validatorConfirmPasswordRequired": "Confirmação de senha é obrigatória",
+  "validatorPasswordsDontMatch": "As senhas não coincidem",
+  "validatorNameRequired": "Nome é obrigatório",
+  "validatorFullNameRequired": "Digite seu nome completo",
+  "validatorNameTooShort": "Nome muito curto",
+  "validatorFieldRequired": "{field} é obrigatório",
+  "@validatorFieldRequired": {
+    "placeholders": { "field": { "type": "String" } }
+  },
+  "validatorMinLength": "{field} deve ter pelo menos {minLength} caracteres",
+  "@validatorMinLength": {
+    "placeholders": {
+      "field": { "type": "String" },
+      "minLength": { "type": "int" }
+    }
+  },
+  "validatorMaxLength": "{field} deve ter no máximo {maxLength} caracteres",
+  "@validatorMaxLength": {
+    "placeholders": {
+      "field": { "type": "String" },
+      "maxLength": { "type": "int" }
+    }
+  },
+
+  "searchHint": "Digite o que você procura",
+  "errorLoadingPosts": "Erro ao carregar posts",
+  "noPostsFound": "Nenhum post encontrado",
+  "beFirstToPublish": "Seja o primeiro a publicar!",
+
+  "errorLoadingProfile": "Erro ao carregar perfil",
+  "userNotFound": "Usuário não encontrado",
+  "tabMyProjects": "Meus projetos",
+  "tabApproved": "Aprovados",
+  "noProjectsYet": "Você ainda não tem projetos",
+  "shareYourProjects": "Compartilhe seus projetos!",
+  "noSharedProjects": "Nenhum projeto compartilhado",
+  "offlineBanner": "Sem conexão — mostrando dados salvos",
+  "avatarUploadSoon": "Upload de avatar em breve...",
+
+  "editPostTitle": "Editar Post",
+  "newProjectTitle": "Novo Projeto",
+  "selectCoverImage": "Por favor, selecione uma imagem de capa",
+  "postUpdatedSuccess": "Post atualizado com sucesso!",
+  "postPublishedSuccess": "Post publicado com sucesso!",
+  "errorPublishingPost": "Erro ao publicar post",
+  "confirmDeleteTitle": "Confirmar exclusão",
+  "confirmDeletePostMessage": "Tem certeza que deseja excluir este post?",
+  "postDeletedSuccess": "Post excluído com sucesso!",
+  "errorDeletingPost": "Erro ao excluir post",
+  "loadImage": "Carregar imagem",
+  "projectNameLabel": "Nome do projeto",
+  "projectNameHint": "React fácil de usar",
+  "fieldTitleRequired": "Por favor, insira o título",
+  "descriptionLabel": "Descrição",
+  "descriptionHint": "Descreva seu projeto...",
+  "fieldDescriptionRequired": "Por favor, insira a descrição",
+  "tagsLabel": "Tags",
+  "tagsHint": "React",
+  "fieldTagsRequired": "Por favor, insira as tags",
+  "takePhoto": "Tirar foto",
+  "chooseFromGallery": "Escolher da galeria",
+  "cameraPermissionDenied": "Permissão de câmera negada.",
+  "cameraPermissionPermanentlyDenied": "Permissão de câmera negada. Habilite nas configurações do app.",
+
+  "noCameraAvailable": "Nenhuma câmera disponível neste dispositivo",
+  "cameraInitError": "Erro ao inicializar a câmera: {error}",
+  "@cameraInitError": {
+    "placeholders": { "error": { "type": "String" } }
+  },
+  "cameraCaptureError": "Erro ao capturar a foto: {error}",
+  "@cameraCaptureError": {
+    "placeholders": { "error": { "type": "String" } }
+  },
+
+  "daysAgo": "{count}d atrás",
+  "@daysAgo": {
+    "placeholders": { "count": { "type": "int" } }
+  },
+  "hoursAgo": "{count}h atrás",
+  "@hoursAgo": {
+    "placeholders": { "count": { "type": "int" } }
+  },
+  "minutesAgo": "{count}min atrás",
+  "@minutesAgo": {
+    "placeholders": { "count": { "type": "int" } }
+  },
+  "justNow": "Agora",
+
+  "errorConnectionTimeout": "Tempo de conexão esgotado. Verifique sua internet.",
+  "errorReceiveTimeout": "Tempo de resposta esgotado. Tente novamente.",
+  "errorConnection": "Erro de conexão. Verifique sua internet.",
+  "errorInvalidData": "Dados inválidos. Verifique as informações.",
+  "errorWrongCredentials": "Email ou senha incorretos.",
+  "errorAccessDenied": "Acesso negado.",
+  "errorEmailAlreadyUsed": "Este email já está cadastrado.",
+  "errorInvalidDataShort": "Dados inválidos.",
+  "errorServer": "Erro no servidor. Tente novamente mais tarde.",
+  "errorGeneric": "Erro ao processar a requisição. Tente novamente.",
+  "errorSessionExpired": "Sessão expirada. Faça login novamente.",
+  "errorNoPermission": "Você não tem permissão para realizar esta ação.",
+  "errorPostNotFound": "Post não encontrado.",
+  "errorFileTooLarge": "Arquivo muito grande. Escolha uma imagem menor.",
+
+  "errorLogin": "Erro ao fazer login. Tente novamente.",
+  "errorRegister": "Erro ao criar conta. Tente novamente.",
+  "errorUpdateAvatar": "Erro ao atualizar avatar",
+  "errorOfflineNoCache": "Sem conexão e nenhum dado salvo localmente",
+  "errorFetchPosts": "Erro ao buscar posts",
+  "errorLikePost": "Erro ao curtir post #{id}",
+  "@errorLikePost": {
+    "placeholders": { "id": { "type": "int" } }
+  },
+  "errorCreatePost": "Erro ao criar post",
+  "errorUpdatePost": "Erro ao atualizar post #{id}",
+  "@errorUpdatePost": {
+    "placeholders": { "id": { "type": "int" } }
+  },
+  "errorDeletePost": "Erro ao excluir post #{id}",
+  "@errorDeletePost": {
+    "placeholders": { "id": { "type": "int" } }
+  },
+
+  "devsNearYouTitle": "Devs por perto",
+  "shareLocationButton": "Compartilhar minha localização",
+  "locationSharedSuccess": "Localização compartilhada com sucesso!",
+  "errorSharingLocation": "Erro ao compartilhar localização",
+  "locationPermissionDeniedMessage": "Permissão de localização negada. Não é possível mostrar devs próximos.",
+  "locationServiceDisabledMessage": "Ative o serviço de localização do dispositivo.",
+  "errorGettingLocation": "Erro ao obter sua localização",
+  "errorLoadingNearbyDevs": "Erro ao carregar devs próximos",
+  "noDevsNearby": "Nenhum dev encontrado por perto",
+  "kmAway": "{km} km de você",
+  "@kmAway": {
+    "placeholders": { "km": { "type": "String" } }
+  },
+  "viewProfile": "Ver perfil",
+  "memberSince": "Membro desde {date}",
+  "@memberSince": {
+    "placeholders": { "date": { "type": "String" } }
+  }
+}

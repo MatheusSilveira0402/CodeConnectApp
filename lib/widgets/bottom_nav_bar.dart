@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../core/constants.dart';
+import '../l10n/app_localizations.dart';
 import '../viewmodels/navigation_viewmodel.dart';
 
 /// Barra de navegação inferior do CodeConnect
@@ -15,25 +15,27 @@ class BottomNavBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return BottomNavigationBar(
       currentIndex: currentIndex,
       type: BottomNavigationBarType.fixed,
-      items: const [
+      items: [
+        BottomNavigationBarItem(icon: const Icon(Icons.feed), label: l10n.navFeed),
         BottomNavigationBarItem(
-          icon: Icon(Icons.feed),
-          label: AppStrings.navFeed,
+          icon: const Icon(Icons.person),
+          label: l10n.navPerfil,
         ),
         BottomNavigationBarItem(
-          icon: Icon(Icons.person),
-          label: AppStrings.navPerfil,
+          icon: const Icon(Icons.map_outlined),
+          label: l10n.navDevsNearYou,
         ),
         BottomNavigationBarItem(
-          icon: Icon(Icons.info),
-          label: AppStrings.navSobreNos,
+          icon: const Icon(Icons.info),
+          label: l10n.navSobreNos,
         ),
         BottomNavigationBarItem(
-          icon: Icon(Icons.logout),
-          label: AppStrings.navSair,
+          icon: const Icon(Icons.logout),
+          label: l10n.navSair,
         ),
       ],
       onTap: (index) => viewModel.navigateTo(context, index),

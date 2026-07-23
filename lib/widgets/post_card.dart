@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../core/utils/api_helper.dart';
 import '../core/utils/app_logger.dart';
+import '../l10n/app_localizations.dart';
 import '../models/blog_post_model.dart';
 import '../theme/app_theme.dart';
 
@@ -156,7 +157,7 @@ class PostCard extends StatelessWidget {
                               ),
                             ),
                             Text(
-                              _formatDate(post.createdAt),
+                              _formatDate(context, post.createdAt),
                               style: const TextStyle(
                                 color: AppTheme.textSecondary,
                                 fontSize: 12,
@@ -225,20 +226,21 @@ class PostCard extends StatelessWidget {
     );
   }
 
-  String _formatDate(DateTime date) {
+  String _formatDate(BuildContext context, DateTime date) {
     final now = DateTime.now();
     final difference = now.difference(date);
+    final l10n = AppLocalizations.of(context);
 
     if (difference.inDays > 7) {
       return '${date.day}/${date.month}/${date.year}';
     } else if (difference.inDays > 0) {
-      return '${difference.inDays}d atrás';
+      return l10n.daysAgo(difference.inDays);
     } else if (difference.inHours > 0) {
-      return '${difference.inHours}h atrás';
+      return l10n.hoursAgo(difference.inHours);
     } else if (difference.inMinutes > 0) {
-      return '${difference.inMinutes}min atrás';
+      return l10n.minutesAgo(difference.inMinutes);
     } else {
-      return 'Agora';
+      return l10n.justNow;
     }
   }
 }

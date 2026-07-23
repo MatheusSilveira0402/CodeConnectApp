@@ -1,13 +1,15 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_mobx/flutter_mobx.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import '../core/constants.dart';
 import '../core/di/service_locator.dart';
+import '../l10n/app_localizations.dart';
 import '../theme/app_theme.dart';
 import '../widgets/custom_app_bar.dart';
 import '../widgets/bottom_nav_bar.dart';
 import '../widgets/post_card.dart';
 import '../viewmodels/navigation_viewmodel.dart';
-import '../stores/post_store.dart';
+import '../cubits/posts/posts_cubit.dart';
+import '../cubits/posts/posts_state.dart';
 import 'criar_post_screen.dart';
 
 /// Tela inicial com feed de publicações
@@ -19,10 +21,11 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  // Criar instância de PostStore via Service Locator
-  late final PostStore _postStore = ServiceLocator.instance.createPostStore();
+  // Criar instância de PostsCubit via Service Locator
+  late final PostsCubit _postsCubit = ServiceLocator.instance
+      .createPostsCubit();
   late final NavigationViewModel _navigationViewModel = NavigationViewModel(
-    ServiceLocator.instance.authStore,
+    ServiceLocator.instance.authCubit,
   );
 
   final TextEditingController _searchController = TextEditingController();
@@ -40,19 +43,20 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   void _loadPosts() {
-    _postStore.fetchPosts();
+    _postsCubit.fetchPosts();
   }
 
   void _searchPosts(String query) {
     if (query.isEmpty) {
-      _postStore.fetchPosts();
+      _postsCubit.fetchPosts();
     } else {
-      _postStore.fetchPosts(search: query);
+      _postsCubit.fetchPosts(search: query);
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return Scaffold(
       appBar: CustomAppBar(
         onPublicarPressed: () async {
@@ -75,7 +79,7 @@ class _HomeScreenState extends State<HomeScreen> {
               controller: _searchController,
               style: const TextStyle(color: AppTheme.textColor),
               decoration: InputDecoration(
-                hintText: 'Digite o que você procura',
+                hintText: l10n.searchHint,
                 hintStyle: TextStyle(
                   color: AppTheme.textColor.withValues(alpha: 0.5),
                 ),
@@ -104,9 +108,10 @@ class _HomeScreenState extends State<HomeScreen> {
 
           // Posts List
           Expanded(
-            child: Observer(
-              builder: (_) {
-                if (_postStore.isLoading && _postStore.posts.isEmpty) {
+            child: BlocBuilder<PostsCubit, PostsState>(
+              bloc: _postsCubit,
+              builder: (context, state) {
+                if (state.isLoading && state.posts.isEmpty) {
                   return const Center(
                     child: CircularProgressIndicator(
                       valueColor: AlwaysStoppedAnimation<Color>(
@@ -116,8 +121,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   );
                 }
 
-                if (_postStore.errorMessage != null &&
-                    _postStore.posts.isEmpty) {
+                if (state.errorMessage != null && state.posts.isEmpty) {
                   return Center(
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
@@ -129,7 +133,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         ),
                         const SizedBox(height: 16),
                         Text(
-                          'Erro ao carregar posts',
+                          l10n.errorLoadingPosts,
                           style: const TextStyle(
                             color: AppTheme.textColor,
                             fontSize: 18,
@@ -138,7 +142,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         ),
                         const SizedBox(height: 8),
                         Text(
-                          _postStore.errorMessage!,
+                          state.errorMessage!,
                           style: const TextStyle(
                             color: AppTheme.textSecondary,
                             fontSize: 14,
@@ -151,14 +155,20 @@ class _HomeScreenState extends State<HomeScreen> {
                           style: ElevatedButton.styleFrom(
                             backgroundColor: AppTheme.primaryColor,
                           ),
-                          child: const Text('Tentar novamente'),
+                          child: Text(
+                            l10n.btnRetry,
+                            style: const TextStyle(
+                              color: Colors.black,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
                         ),
                       ],
                     ),
                   );
                 }
 
-                if (_postStore.posts.isEmpty) {
+                if (state.posts.isEmpty) {
                   return Center(
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
@@ -169,18 +179,18 @@ class _HomeScreenState extends State<HomeScreen> {
                           color: AppTheme.primaryColor.withValues(alpha: 0.3),
                         ),
                         const SizedBox(height: 16),
-                        const Text(
-                          'Nenhum post encontrado',
-                          style: TextStyle(
+                        Text(
+                          l10n.noPostsFound,
+                          style: const TextStyle(
                             fontSize: 18,
                             fontWeight: FontWeight.bold,
                             color: AppTheme.textColor,
                           ),
                         ),
                         const SizedBox(height: 8),
-                        const Text(
-                          'Seja o primeiro a publicar!',
-                          style: TextStyle(
+                        Text(
+                          l10n.beFirstToPublish,
+                          style: const TextStyle(
                             color: AppTheme.textSecondary,
                             fontSize: 14,
                           ),
@@ -195,12 +205,12 @@ class _HomeScreenState extends State<HomeScreen> {
                   color: AppTheme.primaryColor,
                   child: ListView.builder(
                     padding: const EdgeInsets.symmetric(horizontal: 16),
-                    itemCount: _postStore.posts.length,
+                    itemCount: state.posts.length,
                     itemBuilder: (context, index) {
-                      final post = _postStore.posts[index];
+                      final post = state.posts[index];
                       return PostCard(
                         post: post,
-                        onLike: () => _postStore.likePost(post.id),
+                        onLike: () => _postsCubit.likePost(post.id),
                       );
                     },
                   ),

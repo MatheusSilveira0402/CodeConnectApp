@@ -1,12 +1,16 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_mobx/flutter_mobx.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'dart:io';
 import '../core/di/service_locator.dart';
 import '../core/utils/api_helper.dart';
 import '../models/blog_post_model.dart';
-import '../stores/post_store.dart';
+import '../cubits/post_form/post_form_cubit.dart';
+import '../cubits/post_form/post_form_state.dart';
+import '../l10n/app_localizations.dart';
 import '../theme/app_theme.dart';
+import 'camera_capture_screen.dart';
 
 class CriarPostScreen extends StatefulWidget {
   final BlogPostModel? post;
@@ -18,8 +22,9 @@ class CriarPostScreen extends StatefulWidget {
 }
 
 class _CriarPostScreenState extends State<CriarPostScreen> {
-  // Usando Service Locator para criar nova instância de PostStore
-  late final PostStore _postStore = ServiceLocator.instance.createPostStore();
+  // Usando Service Locator para criar nova instância de PostFormCubit
+  late final PostFormCubit _postFormCubit = ServiceLocator.instance
+      .createPostFormCubit();
 
   final _formKey = GlobalKey<FormState>();
   final _titleController = TextEditingController();
@@ -48,7 +53,87 @@ class _CriarPostScreenState extends State<CriarPostScreen> {
     super.dispose();
   }
 
-  Future<void> _pickImage() async {
+  Future<void> _showImageSourcePicker() async {
+    final l10n = AppLocalizations.of(context);
+    await showModalBottomSheet<void>(
+      context: context,
+      backgroundColor: AppTheme.cardColor,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+      ),
+      builder: (sheetContext) {
+        return SafeArea(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              ListTile(
+                leading: const Icon(
+                  Icons.photo_camera_outlined,
+                  color: AppTheme.textColor,
+                ),
+                title: Text(
+                  l10n.takePhoto,
+                  style: const TextStyle(color: AppTheme.textColor),
+                ),
+                onTap: () {
+                  Navigator.pop(sheetContext);
+                  _takePhoto();
+                },
+              ),
+              ListTile(
+                leading: const Icon(
+                  Icons.photo_library_outlined,
+                  color: AppTheme.textColor,
+                ),
+                title: Text(
+                  l10n.chooseFromGallery,
+                  style: const TextStyle(color: AppTheme.textColor),
+                ),
+                onTap: () {
+                  Navigator.pop(sheetContext);
+                  _pickFromGallery();
+                },
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  Future<void> _takePhoto() async {
+    final l10n = AppLocalizations.of(context);
+    final status = await Permission.camera.request();
+
+    if (!status.isGranted) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            status.isPermanentlyDenied
+                ? l10n.cameraPermissionPermanentlyDenied
+                : l10n.cameraPermissionDenied,
+          ),
+          backgroundColor: Colors.red,
+        ),
+      );
+      return;
+    }
+
+    if (!mounted) return;
+    final File? photo = await Navigator.push<File>(
+      context,
+      MaterialPageRoute(builder: (context) => const CameraCaptureScreen()),
+    );
+
+    if (photo != null) {
+      setState(() {
+        _selectedImage = photo;
+      });
+    }
+  }
+
+  Future<void> _pickFromGallery() async {
     final XFile? image = await _picker.pickImage(
       source: ImageSource.gallery,
       maxWidth: 1920,
@@ -64,14 +149,15 @@ class _CriarPostScreenState extends State<CriarPostScreen> {
   }
 
   Future<void> _publishPost() async {
+    final l10n = AppLocalizations.of(context);
     if (!_formKey.currentState!.validate()) {
       return;
     }
 
     if (!isEditing && _selectedImage == null) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Por favor, selecione uma imagem de capa'),
+        SnackBar(
+          content: Text(l10n.selectCoverImage),
           backgroundColor: Colors.red,
         ),
       );
@@ -81,14 +167,14 @@ class _CriarPostScreenState extends State<CriarPostScreen> {
     BlogPostModel? result;
 
     if (isEditing) {
-      result = await _postStore.updatePost(
+      result = await _postFormCubit.updatePost(
         id: widget.post!.id,
         title: _titleController.text.trim(),
         body: _bodyController.text.trim(),
         markdown: _markdownController.text.trim(),
       );
     } else {
-      result = await _postStore.createPost(
+      result = await _postFormCubit.createPost(
         title: _titleController.text.trim(),
         body: _bodyController.text.trim(),
         markdown: _markdownController.text.trim(),
@@ -102,67 +188,71 @@ class _CriarPostScreenState extends State<CriarPostScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
-            isEditing
-                ? 'Post atualizado com sucesso!'
-                : 'Post publicado com sucesso!',
+            isEditing ? l10n.postUpdatedSuccess : l10n.postPublishedSuccess,
           ),
           backgroundColor: Colors.green,
         ),
       );
       Navigator.pop(context, true);
     } else {
+      final state = _postFormCubit.state;
+      final message = state is PostFormError
+          ? state.message
+          : l10n.errorPublishingPost;
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(_postStore.errorMessage ?? 'Erro ao publicar post'),
-          backgroundColor: Colors.red,
-        ),
+        SnackBar(content: Text(message), backgroundColor: Colors.red),
       );
     }
   }
 
   Future<void> _deletePost() async {
     if (!isEditing) return;
+    final l10n = AppLocalizations.of(context);
 
     final confirm = await showDialog<bool>(
       context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Confirmar exclusão'),
-        content: const Text('Tem certeza que deseja excluir este post?'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context, false),
-            child: const Text('Cancelar'),
-          ),
-          TextButton(
-            onPressed: () => Navigator.pop(context, true),
-            style: TextButton.styleFrom(foregroundColor: Colors.red),
-            child: const Text('Excluir'),
-          ),
-        ],
-      ),
+      builder: (dialogContext) {
+        final dialogL10n = AppLocalizations.of(dialogContext);
+        return AlertDialog(
+          title: Text(dialogL10n.confirmDeleteTitle),
+          content: Text(dialogL10n.confirmDeletePostMessage),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(dialogContext, false),
+              child: Text(dialogL10n.btnCancelar),
+            ),
+            TextButton(
+              onPressed: () => Navigator.pop(dialogContext, true),
+              style: TextButton.styleFrom(foregroundColor: Colors.red),
+              child: Text(dialogL10n.btnDelete),
+            ),
+          ],
+        );
+      },
     );
 
     if (!mounted) return;
 
     if (confirm == true) {
-      final success = await _postStore.deletePost(widget.post!.id);
+      final success = await _postFormCubit.deletePost(widget.post!.id);
 
       if (!mounted) return;
 
       if (success) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Post excluído com sucesso!'),
+          SnackBar(
+            content: Text(l10n.postDeletedSuccess),
             backgroundColor: Colors.green,
           ),
         );
         Navigator.pop(context, true);
       } else {
+        final state = _postFormCubit.state;
+        final message = state is PostFormError
+            ? state.message
+            : l10n.errorDeletingPost;
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(_postStore.errorMessage ?? 'Erro ao excluir post'),
-            backgroundColor: Colors.red,
-          ),
+          SnackBar(content: Text(message), backgroundColor: Colors.red),
         );
       }
     }
@@ -170,6 +260,7 @@ class _CriarPostScreenState extends State<CriarPostScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return Scaffold(
       backgroundColor: AppTheme.backgroundColor,
       appBar: AppBar(
@@ -180,7 +271,7 @@ class _CriarPostScreenState extends State<CriarPostScreen> {
           onPressed: () => Navigator.pop(context),
         ),
         title: Text(
-          isEditing ? 'Editar Post' : 'Novo Projeto',
+          isEditing ? l10n.editPostTitle : l10n.newProjectTitle,
           style: const TextStyle(
             color: AppTheme.textColor,
             fontSize: 18,
@@ -195,9 +286,10 @@ class _CriarPostScreenState extends State<CriarPostScreen> {
             ),
         ],
       ),
-      body: Observer(
-        builder: (_) {
-          if (_postStore.isLoading) {
+      body: BlocBuilder<PostFormCubit, PostFormState>(
+        bloc: _postFormCubit,
+        builder: (context, state) {
+          if (state is PostFormLoading) {
             return const Center(
               child: CircularProgressIndicator(
                 valueColor: AlwaysStoppedAnimation<Color>(
@@ -216,7 +308,7 @@ class _CriarPostScreenState extends State<CriarPostScreen> {
                 children: [
                   // Image Picker
                   GestureDetector(
-                    onTap: _pickImage,
+                    onTap: _showImageSourcePicker,
                     child: Container(
                       height: 200,
                       decoration: BoxDecoration(
@@ -254,7 +346,7 @@ class _CriarPostScreenState extends State<CriarPostScreen> {
                                 ),
                                 const SizedBox(height: 8),
                                 Text(
-                                  'Carregar imagem',
+                                  l10n.loadImage,
                                   style: TextStyle(
                                     color: AppTheme.textColor.withValues(
                                       alpha: 0.5,
@@ -267,17 +359,6 @@ class _CriarPostScreenState extends State<CriarPostScreen> {
                           : null,
                     ),
                   ),
-                  if (!isEditing && _selectedImage == null)
-                    Padding(
-                      padding: const EdgeInsets.only(top: 8),
-                      child: Text(
-                        'imagem_projeto.png',
-                        style: TextStyle(
-                          color: AppTheme.textColor.withValues(alpha: 0.6),
-                          fontSize: 12,
-                        ),
-                      ),
-                    ),
                   if (_selectedImage != null)
                     Padding(
                       padding: const EdgeInsets.only(top: 8),
@@ -307,9 +388,9 @@ class _CriarPostScreenState extends State<CriarPostScreen> {
                   const SizedBox(height: 24),
 
                   // Title Field
-                  const Text(
-                    'Nome do projeto',
-                    style: TextStyle(
+                  Text(
+                    l10n.projectNameLabel,
+                    style: const TextStyle(
                       color: AppTheme.textColor,
                       fontSize: 14,
                       fontWeight: FontWeight.w500,
@@ -320,7 +401,7 @@ class _CriarPostScreenState extends State<CriarPostScreen> {
                     controller: _titleController,
                     style: const TextStyle(color: AppTheme.textColor),
                     decoration: InputDecoration(
-                      hintText: 'React easy to here',
+                      hintText: l10n.projectNameHint,
                       hintStyle: TextStyle(
                         color: AppTheme.textColor.withValues(alpha: 0.3),
                       ),
@@ -347,7 +428,7 @@ class _CriarPostScreenState extends State<CriarPostScreen> {
                     ),
                     validator: (value) {
                       if (value == null || value.isEmpty) {
-                        return 'Por favor, insira o título';
+                        return l10n.fieldTitleRequired;
                       }
                       return null;
                     },
@@ -356,9 +437,9 @@ class _CriarPostScreenState extends State<CriarPostScreen> {
                   const SizedBox(height: 24),
 
                   // Description Field
-                  const Text(
-                    'Descrição',
-                    style: TextStyle(
+                  Text(
+                    l10n.descriptionLabel,
+                    style: const TextStyle(
                       color: AppTheme.textColor,
                       fontSize: 14,
                       fontWeight: FontWeight.w500,
@@ -370,8 +451,7 @@ class _CriarPostScreenState extends State<CriarPostScreen> {
                     style: const TextStyle(color: AppTheme.textColor),
                     maxLines: 5,
                     decoration: InputDecoration(
-                      hintText:
-                          'Lorem ipsum dolor sit amet, consectetur adipiscing elit...',
+                      hintText: l10n.descriptionHint,
                       hintStyle: TextStyle(
                         color: AppTheme.textColor.withValues(alpha: 0.3),
                       ),
@@ -398,7 +478,7 @@ class _CriarPostScreenState extends State<CriarPostScreen> {
                     ),
                     validator: (value) {
                       if (value == null || value.isEmpty) {
-                        return 'Por favor, insira a descrição';
+                        return l10n.fieldDescriptionRequired;
                       }
                       return null;
                     },
@@ -407,9 +487,9 @@ class _CriarPostScreenState extends State<CriarPostScreen> {
                   const SizedBox(height: 24),
 
                   // Tags/Markdown Field
-                  const Text(
-                    'Tags',
-                    style: TextStyle(
+                  Text(
+                    l10n.tagsLabel,
+                    style: const TextStyle(
                       color: AppTheme.textColor,
                       fontSize: 14,
                       fontWeight: FontWeight.w500,
@@ -420,7 +500,7 @@ class _CriarPostScreenState extends State<CriarPostScreen> {
                     controller: _markdownController,
                     style: const TextStyle(color: AppTheme.textColor),
                     decoration: InputDecoration(
-                      hintText: 'React',
+                      hintText: l10n.tagsHint,
                       hintStyle: TextStyle(
                         color: AppTheme.textColor.withValues(alpha: 0.3),
                       ),
@@ -447,7 +527,7 @@ class _CriarPostScreenState extends State<CriarPostScreen> {
                     ),
                     validator: (value) {
                       if (value == null || value.isEmpty) {
-                        return 'Por favor, insira as tags';
+                        return l10n.fieldTagsRequired;
                       }
                       return null;
                     },
@@ -470,14 +550,14 @@ class _CriarPostScreenState extends State<CriarPostScreen> {
                                 borderRadius: BorderRadius.circular(8),
                               ),
                             ),
-                            child: const Row(
+                            child: Row(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
-                                Icon(Icons.delete_outline),
-                                SizedBox(width: 8),
+                                const Icon(Icons.delete_outline),
+                                const SizedBox(width: 8),
                                 Text(
-                                  'Descartar',
-                                  style: TextStyle(
+                                  l10n.btnDiscard,
+                                  style: const TextStyle(
                                     fontSize: 16,
                                     fontWeight: FontWeight.w600,
                                   ),
@@ -499,7 +579,7 @@ class _CriarPostScreenState extends State<CriarPostScreen> {
                             ),
                           ),
                           child: Text(
-                            isEditing ? 'Atualizar' : 'Publicar',
+                            isEditing ? l10n.btnUpdate : l10n.btnPublicar,
                             style: const TextStyle(
                               fontSize: 16,
                               fontWeight: FontWeight.w600,

@@ -2,9 +2,12 @@ import 'package:code_connect/core/secure/secure_storage.dart';
 import 'package:dio/dio.dart';
 import '../core/exceptions/api_exception.dart';
 import '../core/http/http_client.dart';
+import '../core/localization/app_localizations_context.dart';
 import '../core/utils/app_logger.dart';
 import '../models/user_model.dart';
 import '../models/auth_response_model.dart';
+import '../models/nearby_user_model.dart';
+import '../models/public_user_model.dart';
 
 /// Interface do repositório de usuário
 abstract class IUserRepository {
@@ -13,6 +16,13 @@ abstract class IUserRepository {
   Future<UserModel> getMe();
   Future<UserModel> updateAvatar(String avatarPath);
   Future<void> logout();
+  Future<UserModel> updateLocation(double latitude, double longitude);
+  Future<List<NearbyUserModel>> getNearbyUsers({
+    required double latitude,
+    required double longitude,
+    double radiusKm,
+  });
+  Future<PublicUserModel> getUserById(String id);
 }
 
 /// Implementação do repositório de usuário
@@ -106,18 +116,83 @@ class UserRepository implements IUserRepository {
     }
   }
 
+  @override
+  Future<UserModel> updateLocation(double latitude, double longitude) async {
+    try {
+      final response = await _dio.patch(
+        '/users/location',
+        data: {'latitude': latitude, 'longitude': longitude},
+      );
+      AppLogger.info('Localização atualizada com sucesso', 'UserRepository');
+      return UserModel.fromJson(response.data);
+    } on DioException catch (e, stackTrace) {
+      AppLogger.error(
+        'Erro ao atualizar localização',
+        e,
+        stackTrace,
+        'UserRepository',
+      );
+      throw _handleError(e);
+    }
+  }
+
+  @override
+  Future<List<NearbyUserModel>> getNearbyUsers({
+    required double latitude,
+    required double longitude,
+    double radiusKm = 10,
+  }) async {
+    try {
+      final response = await _dio.get(
+        '/users/nearby',
+        queryParameters: {
+          'lat': latitude,
+          'lng': longitude,
+          'radiusKm': radiusKm,
+        },
+      );
+      final users = (response.data as List)
+          .map((e) => NearbyUserModel.fromJson(e as Map<String, dynamic>))
+          .toList();
+      AppLogger.debug('${users.length} devs próximos encontrados', 'UserRepository');
+      return users;
+    } on DioException catch (e, stackTrace) {
+      AppLogger.error(
+        'Erro ao buscar devs próximos',
+        e,
+        stackTrace,
+        'UserRepository',
+      );
+      throw _handleError(e);
+    }
+  }
+
+  @override
+  Future<PublicUserModel> getUserById(String id) async {
+    try {
+      final response = await _dio.get('/users/$id');
+      return PublicUserModel.fromJson(response.data);
+    } on DioException catch (e, stackTrace) {
+      AppLogger.error(
+        'Erro ao buscar perfil público #$id',
+        e,
+        stackTrace,
+        'UserRepository',
+      );
+      throw _handleError(e);
+    }
+  }
+
   ApiException _handleError(DioException e) {
     // Erros de rede/conexão
     if (e.type == DioExceptionType.connectionTimeout) {
-      return NetworkException(
-        'Tempo de conexão esgotado. Verifique sua internet.',
-      );
+      return NetworkException(l10n.errorConnectionTimeout);
     }
     if (e.type == DioExceptionType.receiveTimeout) {
-      return NetworkException('Tempo de resposta esgotado. Tente novamente.');
+      return NetworkException(l10n.errorReceiveTimeout);
     }
     if (e.type == DioExceptionType.connectionError) {
-      return NetworkException('Erro de conexão. Verifique sua internet.');
+      return NetworkException(l10n.errorConnection);
     }
 
     // Erros HTTP
@@ -129,40 +204,39 @@ class UserRepository implements IUserRepository {
     switch (statusCode) {
       case 400:
         return ApiException(
-          message: message ?? 'Dados inválidos. Verifique as informações.',
+          message: message ?? l10n.errorInvalidData,
           statusCode: 400,
           data: e.response?.data,
         );
       case 401:
-        return UnauthorizedException(message ?? 'Email ou senha incorretos.');
+        return UnauthorizedException(message ?? l10n.errorWrongCredentials);
       case 403:
         return ApiException(
-          message: message ?? 'Acesso negado.',
+          message: message ?? l10n.errorAccessDenied,
           statusCode: 403,
           data: e.response?.data,
         );
       case 409:
         return ApiException(
-          message: message ?? 'Este email já está cadastrado.',
+          message: message ?? l10n.errorEmailAlreadyUsed,
           statusCode: 409,
           data: e.response?.data,
         );
       case 422:
         return ApiException(
-          message: message ?? 'Dados inválidos.',
+          message: message ?? l10n.errorInvalidDataShort,
           statusCode: 422,
           data: e.response?.data,
         );
       case 500:
         return ApiException(
-          message: 'Erro no servidor. Tente novamente mais tarde.',
+          message: l10n.errorServer,
           statusCode: 500,
           data: e.response?.data,
         );
       default:
         return ApiException(
-          message:
-              message ?? 'Erro ao processar a requisição. Tente novamente.',
+          message: message ?? l10n.errorGeneric,
           statusCode: statusCode,
           data: e.response?.data,
         );

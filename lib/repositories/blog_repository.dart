@@ -1,6 +1,7 @@
 import 'package:dio/dio.dart';
 import '../core/exceptions/api_exception.dart';
 import '../core/http/http_client.dart';
+import '../core/localization/app_localizations_context.dart';
 import '../core/utils/app_logger.dart';
 import '../models/blog_post_model.dart';
 import 'dart:io';
@@ -247,15 +248,13 @@ class BlogRepository implements IBlogRepository {
   ApiException _handleError(DioException e) {
     // Erros de rede/conexão
     if (e.type == DioExceptionType.connectionTimeout) {
-      return NetworkException(
-        'Tempo de conexão esgotado. Verifique sua internet.',
-      );
+      return NetworkException(l10n.errorConnectionTimeout);
     }
     if (e.type == DioExceptionType.receiveTimeout) {
-      return NetworkException('Tempo de resposta esgotado. Tente novamente.');
+      return NetworkException(l10n.errorReceiveTimeout);
     }
     if (e.type == DioExceptionType.connectionError) {
-      return NetworkException('Erro de conexão. Verifique sua internet.');
+      return NetworkException(l10n.errorConnection);
     }
 
     // Erros HTTP
@@ -267,48 +266,45 @@ class BlogRepository implements IBlogRepository {
     switch (statusCode) {
       case 400:
         return ApiException(
-          message: message ?? 'Dados inválidos. Verifique as informações.',
+          message: message ?? l10n.errorInvalidData,
           statusCode: 400,
           data: e.response?.data,
         );
       case 401:
-        return UnauthorizedException(
-          message ?? 'Sessão expirada. Faça login novamente.',
-        );
+        return UnauthorizedException(message ?? l10n.errorSessionExpired);
       case 403:
         return ApiException(
-          message: message ?? 'Você não tem permissão para realizar esta ação.',
+          message: message ?? l10n.errorNoPermission,
           statusCode: 403,
           data: e.response?.data,
         );
       case 404:
         return ApiException(
-          message: message ?? 'Post não encontrado.',
+          message: message ?? l10n.errorPostNotFound,
           statusCode: 404,
           data: e.response?.data,
         );
       case 413:
         return ApiException(
-          message: 'Arquivo muito grande. Escolha uma imagem menor.',
+          message: l10n.errorFileTooLarge,
           statusCode: 413,
           data: e.response?.data,
         );
       case 422:
         return ApiException(
-          message: message ?? 'Dados inválidos.',
+          message: message ?? l10n.errorInvalidDataShort,
           statusCode: 422,
           data: e.response?.data,
         );
       case 500:
         return ApiException(
-          message: 'Erro no servidor. Tente novamente mais tarde.',
+          message: l10n.errorServer,
           statusCode: 500,
           data: e.response?.data,
         );
       default:
         return ApiException(
-          message:
-              message ?? 'Erro ao processar a requisição. Tente novamente.',
+          message: message ?? l10n.errorGeneric,
           statusCode: statusCode,
           data: e.response?.data,
         );

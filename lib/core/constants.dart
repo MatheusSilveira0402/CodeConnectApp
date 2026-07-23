@@ -29,36 +29,14 @@ class UiConstants {
   static const double borderWidthDefault = 2.0;
 }
 
-/// Constantes de texto e mensagens do aplicativo
+/// Constantes gerais do aplicativo.
+///
+/// Textos visíveis ao usuário (labels, botões, mensagens) ficam em
+/// `lib/l10n/*.arb`, acessados via `AppLocalizations` — não aqui.
 class AppStrings {
   AppStrings._();
 
-  // App
   static const String appTitle = 'CodeConnect';
-
-  // Navegação
-  static const String navFeed = 'Feed';
-  static const String navPerfil = 'Perfil';
-  static const String navSobreNos = 'Sobre nós';
-  static const String navSair = 'Sair';
-
-  // Botões
-  static const String btnPublicar = 'Publicar';
-  static const String btnCancelar = 'Cancelar';
-
-  // Telas
-  static const String feedTitle = 'Feed de Publicações';
-  static const String perfilTitle = 'Perfil do Usuário';
-  static const String emBreve = 'Em breve...';
-
-  // Diálogo Logout
-  static const String logoutTitle = 'Sair';
-  static const String logoutMessage = 'Deseja realmente sair?';
-
-  // Sobre Nós
-  static const String sobreNosWelcome = 'Bem-Vindo ao\nCodeConnect!';
-  static const String sobreNosSubtitle =
-      'Onde a comunidade\ne o código se unem!';
 }
 
 /// Constantes de rotas do aplicativo
@@ -67,6 +45,7 @@ class AppRoutes {
 
   static const String home = '/';
   static const String perfil = '/perfil';
+  static const String devsNearYou = '/devs-near-you';
   static const String sobre = '/sobre';
   static const String login = '/login';
   static const String cadastro = '/cadastro';

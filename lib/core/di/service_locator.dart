@@ -1,8 +1,12 @@
+import 'package:connectivity_plus/connectivity_plus.dart';
 import '../../repositories/blog_repository.dart';
 import '../../repositories/user_repository.dart';
-import '../../stores/auth_store.dart';
-import '../../stores/perfil_store.dart';
-import '../../stores/post_store.dart';
+import '../../cubits/auth/auth_cubit.dart';
+import '../../cubits/perfil/perfil_cubit.dart';
+import '../../cubits/posts/posts_cubit.dart';
+import '../../cubits/post_form/post_form_cubit.dart';
+import '../cache/user_local_data_source.dart';
+import '../cache/post_local_data_source.dart';
 
 /// Service Locator para gerenciamento de dependências
 /// Implementa o padrão Singleton para garantir uma única instância
@@ -13,26 +17,47 @@ class ServiceLocator {
   static ServiceLocator get instance => _instance;
 
   // Repositories (Singleton)
-  late final IUserRepository _userRepository;
-  late final IBlogRepository _blogRepository;
+  IUserRepository? _userRepository;
+  IBlogRepository? _blogRepository;
 
-  // Stores (Singleton)
-  late final AuthStore _authStore;
-  late final PerfilStore _perfilStore;
+  // Data sources locais (cache offline, Singleton)
+  UserLocalDataSource? _userLocalDataSource;
+  PostLocalDataSource? _postLocalDataSource;
+
+  // Cubits (Singleton)
+  AuthCubit? _authCubit;
+  PerfilCubit? _perfilCubit;
 
   bool _initialized = false;
 
-  /// Inicializa todas as dependências do aplicativo
-  void initialize() {
+  /// Inicializa todas as dependências do aplicativo.
+  ///
+  /// Os parâmetros opcionais existem para permitir injetar dublês
+  /// (mocks/fakes) em testes de widget — em produção, `main()` chama
+  /// `initialize()` sem argumentos e usa as implementações reais.
+  void initialize({
+    IUserRepository? userRepository,
+    IBlogRepository? blogRepository,
+    Stream<List<ConnectivityResult>>? connectivityStream,
+  }) {
     if (_initialized) return;
 
     // Inicializar Repositories
-    _userRepository = UserRepository();
-    _blogRepository = BlogRepository();
+    _userRepository = userRepository ?? UserRepository();
+    _blogRepository = blogRepository ?? BlogRepository();
 
-    // Inicializar Stores com suas dependências
-    _authStore = AuthStore(_userRepository);
-    _perfilStore = PerfilStore(_userRepository);
+    // Inicializar data sources locais (cache offline)
+    _userLocalDataSource = UserLocalDataSource();
+    _postLocalDataSource = PostLocalDataSource();
+
+    // Inicializar Cubits com suas dependências
+    _authCubit = AuthCubit(_userRepository!);
+    _perfilCubit = PerfilCubit(
+      _userRepository!,
+      _userLocalDataSource,
+      null,
+      connectivityStream,
+    );
 
     _initialized = true;
   }
@@ -40,32 +65,46 @@ class ServiceLocator {
   /// Retorna a instância singleton do UserRepository
   IUserRepository get userRepository {
     _ensureInitialized();
-    return _userRepository;
+    return _userRepository!;
   }
 
   /// Retorna a instância singleton do BlogRepository
   IBlogRepository get blogRepository {
     _ensureInitialized();
-    return _blogRepository;
+    return _blogRepository!;
   }
 
-  /// Retorna a instância singleton do AuthStore
-  AuthStore get authStore {
+  /// Retorna a instância singleton do AuthCubit
+  AuthCubit get authCubit {
     _ensureInitialized();
-    return _authStore;
+    return _authCubit!;
   }
 
-  /// Retorna a instância singleton do PerfilStore
-  PerfilStore get perfilStore {
+  /// Retorna a instância singleton do PerfilCubit
+  PerfilCubit get perfilCubit {
     _ensureInitialized();
-    return _perfilStore;
+    return _perfilCubit!;
   }
 
-  /// Cria uma nova instância de PostStore (não é singleton)
-  /// Cada tela que precisa de posts deve criar sua própria instância
-  PostStore createPostStore() {
+  /// Cria uma nova instância de PostsCubit sem cache local (não é singleton)
+  /// Usado pelo feed da Home, que não precisa funcionar offline
+  PostsCubit createPostsCubit() {
     _ensureInitialized();
-    return PostStore(_blogRepository);
+    return PostsCubit(_blogRepository!);
+  }
+
+  /// Cria uma nova instância de PostsCubit com cache local (não é singleton)
+  /// Usado pela aba "Meus projetos" do Perfil, que deve funcionar offline
+  PostsCubit createUserPostsCubit() {
+    _ensureInitialized();
+    return PostsCubit(_blogRepository!, _postLocalDataSource);
+  }
+
+  /// Cria uma nova instância de PostFormCubit (não é singleton)
+  /// Usado pela tela de criar/editar post
+  PostFormCubit createPostFormCubit() {
+    _ensureInitialized();
+    return PostFormCubit(_blogRepository!);
   }
 
   void _ensureInitialized() {

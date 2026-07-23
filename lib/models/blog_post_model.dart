@@ -1,16 +1,17 @@
+import 'package:equatable/equatable.dart';
 import 'package:json_annotation/json_annotation.dart';
 
 part 'blog_post_model.g.dart';
 
 /// Modelo de autor do post
 @JsonSerializable()
-class PostAuthor {
+class PostAuthor extends Equatable {
   final String id;
   final String name;
   final String? username;
   final String? avatar;
 
-  PostAuthor({
+  const PostAuthor({
     required this.id,
     required this.name,
     this.username,
@@ -21,11 +22,14 @@ class PostAuthor {
       _$PostAuthorFromJson(json);
 
   Map<String, dynamic> toJson() => _$PostAuthorToJson(this);
+
+  @override
+  List<Object?> get props => [id, name, username, avatar];
 }
 
 /// Modelo de post do blog
-@JsonSerializable()
-class BlogPostModel {
+@JsonSerializable(explicitToJson: true)
+class BlogPostModel extends Equatable {
   final int id;
   final String? cover;
   final String? imageUrl;
@@ -39,7 +43,7 @@ class BlogPostModel {
   final DateTime createdAt;
   final DateTime updatedAt;
 
-  BlogPostModel({
+  const BlogPostModel({
     required this.id,
     this.cover,
     this.imageUrl,
@@ -63,6 +67,22 @@ class BlogPostModel {
   String get authorName => author.name;
   String get authorId => author.id;
   String get image => imageUrl ?? '';
+
+  @override
+  List<Object?> get props => [
+    id,
+    cover,
+    imageUrl,
+    title,
+    slug,
+    body,
+    markdown,
+    likes,
+    author,
+    comments,
+    createdAt,
+    updatedAt,
+  ];
 }
 
 /// Modelo de comentário

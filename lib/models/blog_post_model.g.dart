@@ -47,7 +47,7 @@ Map<String, dynamic> _$BlogPostModelToJson(BlogPostModel instance) =>
       'body': instance.body,
       'markdown': instance.markdown,
       'likes': instance.likes,
-      'author': instance.author,
+      'author': instance.author.toJson(),
       'comments': instance.comments,
       'createdAt': instance.createdAt.toIso8601String(),
       'updatedAt': instance.updatedAt.toIso8601String(),

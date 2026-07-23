@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../core/constants.dart';
 import '../core/di/service_locator.dart';
+import '../l10n/app_localizations.dart';
 import '../theme/app_theme.dart';
 import '../widgets/custom_app_bar.dart';
 import '../widgets/bottom_nav_bar.dart';
@@ -18,11 +19,12 @@ class SobreNosScreen extends StatefulWidget {
 
 class _SobreNosScreenState extends State<SobreNosScreen> {
   late final NavigationViewModel _navigationViewModel = NavigationViewModel(
-    ServiceLocator.instance.authStore,
+    ServiceLocator.instance.authCubit,
   );
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return Scaffold(
       appBar: const CustomAppBar(),
       body: SingleChildScrollView(
@@ -42,34 +44,25 @@ class _SobreNosScreenState extends State<SobreNosScreen> {
                 children: [
                   Column(
                     children: [
+                      Text(l10n.sobreNosWelcome, style: AppTheme.titleLarge),
                       Text(
-                        AppStrings.sobreNosWelcome,
-                        style: AppTheme.titleLarge,
-                      ),
-                      Text(
-                        AppStrings.sobreNosSubtitle,
+                        l10n.sobreNosSubtitle,
                         style: AppTheme.titleLargeWhite,
                       ),
                     ],
                   ),
                 ],
               ),
-              const SectionContent(
-                'No coração da revolução digital está o CodeConnect nasceu da visão de criar um espaço onde desenvolvedores e apaixonados e entusiastas da tecnologia podem se conectar, aprender e colaborar de maneira inigualável! Somos uma comunidade global apaixonada, por código e comprometidos em oferecer um ambiente inclusivo e acolhedor para todos os níveis de habilidade.',
-              ),
-              const SectionTitle('Nossa Missão'),
-              const SectionContent(
-                'Na CodeConnect, acreditamos que a colaboração é a essência da inovação. Nossa missão é fornecer uma plataforma onde as mentes criativas podem se unir, compartilhar conhecimento, e desenvolver projetos extraordinários. Quer você seja um novato ansioso para aprender ou um veterano experiente, você encontrará aqui um lar para suas aspirações tecnológicas.',
-              ),
+              SectionContent(l10n.sobreNosIntro),
+              SectionTitle(l10n.sobreNosMissionTitle),
+              SectionContent(l10n.sobreNosMissionText),
               Image.asset(
                 'lib/assets/notebook.png',
                 fit: BoxFit.cover,
                 width: double.infinity,
               ),
-              const SectionTitle('Junte-se a Nós!'),
-              const SectionContent(
-                'Estamos animados para ter você conosco nesta jornada empolgante. Junte-se à nossa comunidade vibrante e descubra o poder da colaboração no mundo do código',
-              ),
+              SectionTitle(l10n.sobreNosJoinTitle),
+              SectionContent(l10n.sobreNosJoinText),
               Center(
                 child: Image.asset(
                   'lib/assets/icon_logo_verde.png',
@@ -77,17 +70,14 @@ class _SobreNosScreenState extends State<SobreNosScreen> {
                   height: UiConstants.logoIconSize,
                 ),
               ),
-              Text(
-                'Juntos, vamos transformar ideias em inovações e moldar o futuro digital.',
-                style: AppTheme.bodyMedium,
-              ),
+              Text(l10n.sobreNosFooter, style: AppTheme.bodyMedium),
             ],
           ),
         ),
       ),
       bottomNavigationBar: BottomNavBar(
         viewModel: _navigationViewModel,
-        currentIndex: 2,
+        currentIndex: 3,
       ),
     );
   }
