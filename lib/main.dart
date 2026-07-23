@@ -12,6 +12,7 @@ import 'screens/home_screen.dart';
 import 'screens/login_screen.dart';
 import 'screens/perfil_screen.dart';
 import 'screens/sobre_nos_screen.dart';
+import 'screens/splash_screen.dart';
 import 'theme/app_theme.dart';
 
 Future<void> main() async {
@@ -46,8 +47,9 @@ class CodeConnectApp extends StatelessWidget {
       theme: AppTheme.theme,
       localizationsDelegates: AppLocalizations.localizationsDelegates,
       supportedLocales: AppLocalizations.supportedLocales,
-      initialRoute: AppRoutes.login,
+      initialRoute: AppRoutes.splash,
       routes: {
+        AppRoutes.splash: (context) => const SplashScreen(),
         AppRoutes.login: (context) => const LoginScreen(),
         AppRoutes.cadastro: (context) => const CadastroScreen(),
         AppRoutes.home: (context) => const HomeScreen(),

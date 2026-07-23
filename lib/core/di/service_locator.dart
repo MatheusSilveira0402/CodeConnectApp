@@ -51,7 +51,7 @@ class ServiceLocator {
     _postLocalDataSource = PostLocalDataSource();
 
     // Inicializar Cubits com suas dependências
-    _authCubit = AuthCubit(_userRepository!);
+    _authCubit = AuthCubit(_userRepository!, null, _userLocalDataSource);
     _perfilCubit = PerfilCubit(
       _userRepository!,
       _userLocalDataSource,

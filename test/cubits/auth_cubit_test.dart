@@ -1,4 +1,5 @@
 import 'package:bloc_test/bloc_test.dart';
+import 'package:code_connect/core/cache/user_local_data_source.dart';
 import 'package:code_connect/core/exceptions/api_exception.dart';
 import 'package:code_connect/cubits/auth/auth_cubit.dart';
 import 'package:code_connect/cubits/auth/auth_state.dart';
@@ -7,8 +8,11 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 
 import '../fixtures.dart';
+import '../mocks/mock_local_storage.dart';
 
 class MockUserRepository extends Mock implements IUserRepository {}
+
+class MockUserLocalDataSource extends Mock implements UserLocalDataSource {}
 
 void main() {
   late MockUserRepository repository;
@@ -132,6 +136,101 @@ void main() {
       build: () => AuthCubit(repository),
       act: (cubit) => cubit.logout(),
       expect: () => [const AuthError('Erro de conexão.')],
+    );
+  });
+
+  group('AuthCubit.checkAuthStatus (fluxo da SplashScreen)', () {
+    // Usa MockLocalStorage (implementação de ILocalStorage em memória) —
+    // não depende de nenhum storage real (secure_storage, Hive, etc).
+    late MockLocalStorage tokenStorage;
+
+    setUp(() {
+      tokenStorage = MockLocalStorage();
+    });
+
+    blocTest<AuthCubit, AuthState>(
+      'emite [AuthLoading, AuthUnauthenticated] e não chama a API quando não há token salvo',
+      build: () => AuthCubit(repository, tokenStorage),
+      act: (cubit) => cubit.checkAuthStatus(),
+      expect: () => [const AuthLoading(), const AuthUnauthenticated()],
+      verify: (_) {
+        verifyNever(() => repository.getMe());
+      },
+    );
+
+    blocTest<AuthCubit, AuthState>(
+      'emite [AuthLoading, AuthAuthenticated] quando o token salvo ainda é válido',
+      setUp: () async {
+        await tokenStorage.save('auth_token', 'token-valido');
+        when(() => repository.getMe()).thenAnswer((_) async => buildUser());
+      },
+      build: () => AuthCubit(repository, tokenStorage),
+      act: (cubit) => cubit.checkAuthStatus(),
+      expect: () => [
+        const AuthLoading(),
+        isA<AuthAuthenticated>().having(
+          (s) => s.user.email,
+          'user.email',
+          'ana@codeconnect.com',
+        ),
+      ],
+    );
+
+    blocTest<AuthCubit, AuthState>(
+      'emite [AuthLoading, AuthUnauthenticated] e apaga o token quando o servidor recusa (401)',
+      setUp: () async {
+        await tokenStorage.save('auth_token', 'token-expirado');
+        when(
+          () => repository.getMe(),
+        ).thenThrow(UnauthorizedException('Sessão expirada.'));
+      },
+      build: () => AuthCubit(repository, tokenStorage),
+      act: (cubit) => cubit.checkAuthStatus(),
+      expect: () => [const AuthLoading(), const AuthUnauthenticated()],
+      verify: (_) async {
+        expect(await tokenStorage.read('auth_token'), isNull);
+      },
+    );
+
+    blocTest<AuthCubit, AuthState>(
+      'mantém a sessão com dados em cache quando não consegue confirmar com o servidor',
+      setUp: () async {
+        await tokenStorage.save('auth_token', 'token-valido');
+        when(
+          () => repository.getMe(),
+        ).thenThrow(NetworkException('Sem conexão.'));
+      },
+      build: () {
+        final localDataSource = MockUserLocalDataSource();
+        when(() => localDataSource.getUser()).thenReturn(buildUser());
+        return AuthCubit(repository, tokenStorage, localDataSource);
+      },
+      act: (cubit) => cubit.checkAuthStatus(),
+      expect: () => [
+        const AuthLoading(),
+        isA<AuthAuthenticated>().having(
+          (s) => s.user.email,
+          'user.email',
+          'ana@codeconnect.com',
+        ),
+      ],
+    );
+
+    blocTest<AuthCubit, AuthState>(
+      'emite [AuthLoading, AuthUnauthenticated] quando não há conexão nem cache local',
+      setUp: () async {
+        await tokenStorage.save('auth_token', 'token-valido');
+        when(
+          () => repository.getMe(),
+        ).thenThrow(NetworkException('Sem conexão.'));
+      },
+      build: () {
+        final localDataSource = MockUserLocalDataSource();
+        when(() => localDataSource.getUser()).thenReturn(null);
+        return AuthCubit(repository, tokenStorage, localDataSource);
+      },
+      act: (cubit) => cubit.checkAuthStatus(),
+      expect: () => [const AuthLoading(), const AuthUnauthenticated()],
     );
   });
 }
